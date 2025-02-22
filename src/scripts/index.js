@@ -37,17 +37,15 @@ const popupCloseButtons = document.querySelectorAll('.popup__close');
 const profileEditButton = document.querySelector('.profile__edit-button');
 const profileAddButton = document.querySelector('.profile__add-button');
 
+const cardFunctions =
+{
+  delFunction: deleteCard,
+  likeFunction: likeClicked,
+  imageClickedFunc: imageClicked
+};
+
 initialCards.forEach((card)=> {
-  const cardData = 
-  {
-    name: card.name,
-    link: card.link,
-    alt: card.name,
-    delFunction: deleteCard,
-    likeFunction: likeClicked,
-    imageClickedFunc: imageClicked
-  }
-  cards.append(makeCard(cardData));
+  cards.append(makeCard(card, cardFunctions));
 })
 
 profileEditButton.addEventListener('click', function(evt){
@@ -73,6 +71,7 @@ function imageClicked(link, name)
 {
   openModal(imageTypePopup);
   popupImage.src = link;
+  popupImage.alt = name;
   popupCaption.textContent = name;
 }
 
@@ -97,13 +96,9 @@ function addNewPlace(evt)
   const cardData = {
     name: cardNameInput.value,
     link: cardUrlInput.value,
-    alt: cardNameInput.value,
-    delFunction: deleteCard,
-    likeFunction: likeClicked,
-    imageClickedFunc: imageClicked
   }
 
-  cards.prepend(makeCard(cardData));
+  cards.prepend(makeCard(cardData, cardFunctions));
 
   closeModal(cardTypePopup);
 
