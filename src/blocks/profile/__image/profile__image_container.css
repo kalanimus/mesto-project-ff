@@ -1,0 +1,47 @@
+.profile__image_container{
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 29px 0 0;
+  border-radius: 50%;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  background-position: center; 
+  background-size: cover;
+  cursor: pointer;
+}
+
+.profile__image_container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  opacity: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: opacity 0.3s ease;
+}
+
+.profile__image_container::after{
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  opacity: 0;
+  background-image: url("../../../images/edit-icon.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter: brightness(0) invert(1);
+  transition: opacity 0.3s ease;
+  transform: translate(-50%, -50%);
+}
+
+.profile__image_container:hover::before,
+.profile__image_container:hover::after{
+  opacity: 1;
+}

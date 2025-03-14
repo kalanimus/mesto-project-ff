@@ -1,0 +1,18 @@
+.popup__input_type_error {
+  border-bottom-color: red;
+}
+
+.popup__input_error {
+  position: absolute;
+  top: 90%;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  opacity: 0;
+  color: red;
+  font-size: 12px;
+}
+
+.popup__error_visible{
+  opacity: 1;
+}
