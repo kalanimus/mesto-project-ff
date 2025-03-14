@@ -26,7 +26,7 @@ export function deleteCard (card)
 }
 
 
-export function likeClicked(card)
+export function clickOnLike(card)
 {
   const heart = card.querySelector('.card__like-button');
   heart.classList.toggle('card__like-button_is-active');
@@ -34,6 +34,6 @@ export function likeClicked(card)
 
 function updateLike(likes, profileId, card){
   if (likes !== 0 && likes.some(user => user._id === profileId)){
-    likeClicked(card);
+    clickOnLike(card);
   }
 }

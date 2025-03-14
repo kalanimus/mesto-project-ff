@@ -10,7 +10,7 @@
 
 import '../pages/index.css';
 import {initialCards} from './cards.js';
-import {makeCard, deleteCard, likeClicked} from './card.js';
+import {makeCard, deleteCard, clickOnLike} from './card.js';
 import {openModal, closeModal} from './modal.js';
 import {enableValidation, clearValidation, validationConfig} from './validation.js';
 import {getProfileInfoByAPI, getCardsByAPI, updateProfileDataAPI, addNewCardAPI, deleteCardAPI, likeCardAPI, unlikeCardAPI, updateAvatarAPI} from './api.js';
@@ -63,6 +63,9 @@ Promise.all([getProfileInfoByAPI(), getCardsByAPI()]).then(([profileData, cardsD
   profileImage.src = profileData.avatar;
 
   cardsData.forEach(cardData => {cards.append(makeCard(cardData, cardFunctions, userId))});
+}) 
+.catch ((err) => {
+  console.error(err);
 })
 
 const handleDeleteCard = (cardId, cardElement) => {
@@ -76,45 +79,57 @@ const handleDeleteCard = (cardId, cardElement) => {
 confirmDeleteButton.addEventListener('click', () => {
   if (!cardForDelete) return;
 
-  deleteCardAPI(cardForDelete.cardId);
-  deleteCard(cardForDelete.cardElement);
+  deleteCardAPI(cardForDelete.cardId)
+  .then ((res) => {
+    deleteCard(cardForDelete.cardElement);
+    cardForDelete = null;
+    closeModal(deleteCardTypePopup);
+  })
+  .catch ((err) => {
+    console.error(err);
+  })
 
-  cardForDelete = null;
-
-  closeModal(deleteCardTypePopup);
 })
 
 const handleLikeCard = (cardId, cardElement) => {
   if (cardElement.querySelector('.card__like-button').classList.contains('card__like-button_is-active')){
-    unlikeCardAPI(cardId).then(res => cardElement.querySelector('.card__like-amount').textContent = res.likes.length);
+    unlikeCardAPI(cardId).then(res => {
+      cardElement.querySelector('.card__like-amount').textContent = res.likes.length
+      clickOnLike(cardElement);
+    })
+    .catch ((err) => {
+      console.error(err);
+    })
   } else {
-    likeCardAPI(cardId).then(res => cardElement.querySelector('.card__like-amount').textContent = res.likes.length);
+    likeCardAPI(cardId).then(res => {
+      cardElement.querySelector('.card__like-amount').textContent = res.likes.length
+      clickOnLike(cardElement);
+    })
+    .catch ((err) => {
+      console.error(err);
+    })
   }
-  likeClicked(cardElement);
 }
 
 const cardFunctions =
 {
   delFunction: handleDeleteCard,
   likeFunction: handleLikeCard,
-  imageClickedFunc: imageClicked
+  imageClickedFunc: clickOnImage
 };
 
 editAvatarButton.addEventListener('click', (evt) => {
-  resetButtonText(avatarSumbitButton);
   openModal(editAvatarPopup);
   clearValidation(editAvatarForm, validationConfig);
 })
 
 profileEditButton.addEventListener('click', function(evt){
-  resetButtonText(profileSumbitButton);
   openModal(profileTypePopup);
   getDataFromProfile();
   clearValidation(profileForm, validationConfig);
 });
 
 profileAddButton.addEventListener('click', function(evt){
-  resetButtonText(cardSumbitButton);
   openModal(cardTypePopup);
   clearValidation(cardForm, validationConfig);
 });
@@ -131,7 +146,7 @@ cardForm.addEventListener('submit', addNewPlace);
 
 editAvatarForm.addEventListener('submit', updateAvatar);
 
-function imageClicked(link, name)
+function clickOnImage(link, name)
 {
   openModal(imageTypePopup);
   popupImage.src = link;
@@ -151,10 +166,19 @@ function setDataFromProfile(evt)
   toggleLoading(profileSumbitButton);
   const newName = profileNameInput.value;
   const newAbout = profileDescriptionInput.value;
-  profileName.textContent = newName;
-  profileDescription.textContent = newAbout;
-  updateProfileDataAPI(newName, newAbout);
-  closeModal(profileTypePopup);
+  updateProfileDataAPI(newName, newAbout)
+  .then((data) => {
+    profileName.textContent = data.name;
+    profileDescription.textContent = data.about;
+    closeModal(profileTypePopup);
+  }) 
+  .catch (err => {
+    console.error(err);
+  })
+  .finally(() => {
+    resetButtonText(profileSumbitButton);
+  })
+  
 }
 
 function addNewPlace(evt)
@@ -167,27 +191,40 @@ function addNewPlace(evt)
     likes: 0,
   }
 
-  cards.prepend(makeCard(cardData, cardFunctions));
-  addNewCardAPI(cardData.name, cardData.link);
-
-  closeModal(cardTypePopup);
-
-  cardForm.reset();
+  addNewCardAPI(cardData.name, cardData.link)
+  .then(() => {
+    cards.prepend(makeCard(cardData, cardFunctions));
+    closeModal(cardTypePopup);
+    cardForm.reset();
+  })  
+  .catch (err => {
+    console.error(err);
+  })
+  .finally(() => {
+    resetButtonText(cardSumbitButton);
+  })
 }
 
 function updateAvatar () {
   toggleLoading(avatarSumbitButton);
   const avatarUrl = avatarUrlInput.value;
-  profileImage.src = avatarUrl;
-  updateAvatarAPI(avatarUrl);
-  closeModal(editAvatarPopup);
-  editAvatarForm.reset();
+  
+  updateAvatarAPI(avatarUrl)
+  .then (() => {
+    profileImage.src = avatarUrl;
+    closeModal(editAvatarPopup);
+    editAvatarForm.reset();
+  })
+  .catch (err => {
+    console.error(err);
+  })
+  .finally(() => {
+    resetButtonText(avatarSumbitButton);
+  })
 }
 
 function toggleLoading (button) {
-  console.log(button.textContent);
   button.textContent = 'Сохранение...';
-  console.log(button.textContent);
 }
 
 function resetButtonText (button){

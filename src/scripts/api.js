@@ -7,27 +7,19 @@ const config = {
 }
 
 export const getProfileInfoByAPI = () => {
-  return fetch(`${config.baseUrl}/users/me`, {
+  return request(`${config.baseUrl}/users/me`, {
     headers: config.headers
   })
-
-  .then(hadleResponse)
-
-  .catch(handleError)
 }
 
 export const getCardsByAPI = () => {
-  return fetch(`${config.baseUrl}/cards`, {
+  return request(`${config.baseUrl}/cards`, {
     headers: config.headers
   })
-
-  .then(hadleResponse)
-
-  .catch(handleError)
 }
 
 export const updateProfileDataAPI = (name, about) => {
-  fetch(`${config.baseUrl}/users/me`, {
+  return request(`${config.baseUrl}/users/me`, {
     method: 'PATCH',
     headers: config.headers,
     body: JSON.stringify({
@@ -35,12 +27,11 @@ export const updateProfileDataAPI = (name, about) => {
       about: about
     })
   })
-  .then(hadleResponse)
-  .catch(handleError)
+
 }
 
 export const addNewCardAPI = (name, link) => {
-  fetch(`${config.baseUrl}/cards`, {
+  return request(`${config.baseUrl}/cards`, {
     method: 'POST',
     headers: config.headers,
     body: JSON.stringify({
@@ -48,47 +39,37 @@ export const addNewCardAPI = (name, link) => {
       link: link
     })
   })
-  .then(hadleResponse)
-  .catch(handleError)
 }
 
 export const deleteCardAPI = (cardId) => {
-  fetch(`${config.baseUrl}/cards/${cardId}`, {
+  return request(`${config.baseUrl}/cards/${cardId}`, {
     method: 'DELETE',
     headers: config.headers
   })
-  .then(hadleResponse)
-  .catch(handleError)
 }
 
 export const likeCardAPI = (cardId) => {
-  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
-    method: 'PUT',
-    headers: config.headers
-  })
-  .then(hadleResponse)
-  .catch(handleError)
+  return request(`${config.baseUrl}/cards/likes/${cardId}`, {
+      method: 'PUT',
+      headers: config.headers
+    })
 }
 
 export const unlikeCardAPI = (cardId) => {
-  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+  return request(`${config.baseUrl}/cards/likes/${cardId}`, {
     method: 'DELETE',
     headers: config.headers
   })
-  .then(hadleResponse)
-  .catch(handleError)
 }
 
 export const updateAvatarAPI = (avatarUrl) => {
-  return fetch(`${config.baseUrl}/users/me/avatar`, {
+  return request(`${config.baseUrl}/users/me/avatar`, {
     method: 'PATCH',
     headers: config.headers,
     body: JSON.stringify({
       avatar: avatarUrl
     })
   })
-  .then(hadleResponse)
-  .catch(handleError)
 }
 
 const hadleResponse = (res) => {
@@ -100,6 +81,6 @@ const hadleResponse = (res) => {
   }
 };
 
-const handleError = (err) => {
-  console.log(err);
+const request = (url, options) => {
+  return fetch(url, options).then(hadleResponse)
 }
